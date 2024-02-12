@@ -1,7 +1,7 @@
 package com.example.Atipera.github;
 
-import com.example.Atipera.exceptions.InvalidRequestDataException;
 import com.example.Atipera.github.DTOs.GitHubResponseDTO;
+import com.example.Atipera.github.DTOs.GitHubService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,10 +20,6 @@ public class GitHubController {
 
     @GetMapping("/user/{username}")
     ResponseEntity<Set<GitHubResponseDTO>> getRepositories(@PathVariable String username) {
-        if (username.isBlank()){
-            throw new InvalidRequestDataException("Username cannot be blank!");
-        }
-
         return ResponseEntity.ok(gitHubService.getRepositories(username));
     }
 }

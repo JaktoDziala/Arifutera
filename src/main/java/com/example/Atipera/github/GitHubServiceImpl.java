@@ -4,10 +4,10 @@ import com.example.Atipera.exceptions.DataProcessingException;
 import com.example.Atipera.exceptions.ResourceNotFoundException;
 import com.example.Atipera.github.DTOs.BranchDTO;
 import com.example.Atipera.github.DTOs.GitHubResponseDTO;
+import com.example.Atipera.github.DTOs.GitHubService;
 import com.example.Atipera.github.DTOs.RepositoryDTO;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -20,12 +20,12 @@ import java.util.stream.Collectors;
 
 
 @Service
-public class GitHubService {
+public class GitHubServiceImpl implements GitHubService {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final RestTemplate restTemplate;
     private final String gitHubApiBaseUrl;
 
-    GitHubService(RestTemplate restTemplate, @Value("${github.api.base-url}") String gitHubApiBaseUrl) {
+    GitHubServiceImpl(RestTemplate restTemplate, @Value("${github.api.base-url}") String gitHubApiBaseUrl) {
         this.restTemplate = restTemplate;
         this.gitHubApiBaseUrl = gitHubApiBaseUrl;
     }
@@ -34,7 +34,8 @@ public class GitHubService {
      TTL of @Cacheable - 120s
      */
     @Cacheable(value = "repositories", key = "#username")
-    Set<GitHubResponseDTO> getRepositories(String username) {
+    @Override
+    public Set<GitHubResponseDTO> getRepositories(String username) {
         Set<GitHubResponseDTO> gitHubResponseDTOS = new HashSet<>();
 
         fetchUserNonForkRepositories(username).forEach((repositoryDTO -> {
@@ -50,7 +51,7 @@ public class GitHubService {
         return gitHubResponseDTOS;
     }
 
-    Set<RepositoryDTO> fetchUserNonForkRepositories(String username) {
+    public Set<RepositoryDTO> fetchUserNonForkRepositories(String username) {
         String url = gitHubApiBaseUrl + "/users/" + username + "/repos";
         String json;
         try {
@@ -71,7 +72,7 @@ public class GitHubService {
         }
     }
 
-     Set<BranchDTO> fetchRepositoryBranches(String username, String repositoryName) {
+    public Set<BranchDTO> fetchRepositoryBranches(String username, String repositoryName) {
         String url = gitHubApiBaseUrl + "/repos/" + username + "/" + repositoryName + "/branches";
         String json;
         try {

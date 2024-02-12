@@ -1,6 +1,7 @@
 package com.example.Atipera.github;
 
 import com.example.Atipera.exceptions.ResourceNotFoundException;
+import com.example.Atipera.github.DTOs.GitHubService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -21,15 +22,6 @@ public class GitHubControllerTest {
     private MockMvc mockMvc;
     @MockBean
     private GitHubService gitHubService;
-
-    @Test
-    void getRepositories_withBlankUsername_throwsException() throws Exception {
-        mockMvc.perform(get("/user/{username}", " ")
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Username cannot be blank! Please provide missing data."))
-                .andExpect(jsonPath("$.status").value("BAD_REQUEST"));
-    }
 
     @Test
     void getRepositories_withNotExistingUsername_throwsException() throws Exception {

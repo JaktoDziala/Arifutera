@@ -4,14 +4,11 @@ import com.example.Atipera.exceptions.ResourceNotFoundException;
 import com.example.Atipera.github.DTOs.BranchDTO;
 import com.example.Atipera.github.DTOs.CommitDTO;
 import com.example.Atipera.github.DTOs.GitHubResponseDTO;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,9 +20,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class GitHubServiceTest {
+class GitHubServiceImplTest {
 
-    private GitHubService sut;
+    private GitHubServiceImpl sut;
     @Mock
     private RestTemplate restTemplate;
     private final static String VALID_USERNAME = "JaktoDziala";
@@ -35,7 +32,7 @@ class GitHubServiceTest {
 
     @BeforeEach
     void setup(){
-        sut = new GitHubService(restTemplate, "https://api.github.com");
+        sut = new GitHubServiceImpl(restTemplate, "https://api.github.com");
     }
 
     @Test
