@@ -1,5 +1,6 @@
 package com.example.Atipera.github;
 
+import com.example.Atipera.exceptions.DataProcessingException;
 import com.example.Atipera.exceptions.ResourceNotFoundException;
 import com.example.Atipera.github.DTOs.BranchDTO;
 import com.example.Atipera.github.DTOs.GitHubResponseDTO;
@@ -7,6 +8,7 @@ import com.example.Atipera.github.DTOs.RepositoryDTO;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -26,6 +28,10 @@ public class GitHubService {
         this.restTemplate = restTemplate;
     }
 
+    /**
+     TTL of @Cacheable - 120s
+     */
+    @Cacheable(value = "repositories", key = "#username")
     public Set<GitHubResponseDTO> getRepositories(String username) {
         Set<GitHubResponseDTO> gitHubResponseDTOS = new HashSet<>();
 
@@ -60,8 +66,7 @@ public class GitHubService {
                     .collect(Collectors.toSet());
 
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new DataProcessingException("Failed to process repository data for username: " + username + ". Check the response structure and data integrity.");
         }
     }
 
@@ -79,8 +84,7 @@ public class GitHubService {
             return OBJECT_MAPPER.readValue(json, new TypeReference<>() {
             });
         } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+            throw new DataProcessingException("Failed to process branch data for repository: " + repositoryName + " under username: " + username + ". Check the response structure and data integrity.");
         }
     }
 }
