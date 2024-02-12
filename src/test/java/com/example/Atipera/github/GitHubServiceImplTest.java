@@ -1,9 +1,9 @@
 package com.example.Atipera.github;
 
 import com.example.Atipera.exceptions.ResourceNotFoundException;
-import com.example.Atipera.github.DTOs.BranchDTO;
-import com.example.Atipera.github.DTOs.CommitDTO;
-import com.example.Atipera.github.DTOs.GitHubResponseDTO;
+import com.example.Atipera.github.DTOs.*;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +25,9 @@ class GitHubServiceImplTest {
     private GitHubServiceImpl sut;
     @Mock
     private RestTemplate restTemplate;
+    @Mock
+    private ObjectMapper objectMapper;
+
     private final static String VALID_USERNAME = "JaktoDziala";
     private final static String VALID_REPOSITORY = "repo";
     private final static String REPOSITORY_URL = "https://api.github.com/users/" + VALID_USERNAME + "/repos";
@@ -32,7 +35,7 @@ class GitHubServiceImplTest {
 
     @BeforeEach
     void setup(){
-        sut = new GitHubServiceImpl(restTemplate, "https://api.github.com");
+        sut = new GitHubServiceImpl(restTemplate, objectMapper, "https://api.github.com");
     }
 
     @Test
@@ -40,9 +43,14 @@ class GitHubServiceImplTest {
         // given
         String reposJson = "[{\"name\":\"repo\",\"owner\":{\"login\":\"JaktoDziala\"},\"fork\":false}]";
         String branchesJson = "[{\"name\":\"main\",\"commit\":{\"sha\":\"2093489\"}}]";
+        Set<RepositoryDTO> expectedRepos = Set.of(new RepositoryDTO("repo", new OwnerDTO("JaktoDziala"), false));
+        Set<BranchDTO> expectedBranches = Set.of(new BranchDTO("main", new CommitDTO("2093489")));
 
         when(restTemplate.getForObject(REPOSITORY_URL, String.class)).thenReturn(reposJson);
         when(restTemplate.getForObject(BRANCH_URL, String.class)).thenReturn(branchesJson);
+        when(objectMapper.readValue(eq(reposJson), any(TypeReference.class))).thenReturn(expectedRepos);
+        when(objectMapper.readValue(eq(branchesJson), any(TypeReference.class))).thenReturn(expectedBranches);
+
 
         // when
         Set<GitHubResponseDTO> result = sut.getRepositories(VALID_USERNAME);
@@ -60,6 +68,7 @@ class GitHubServiceImplTest {
         // given
         String reposJson = "[{\"name\":\"repo\",\"owner\":{\"login\":\"JaktoDziala\"},\"fork\":true}]";
         when(restTemplate.getForObject(REPOSITORY_URL, String.class)).thenReturn(reposJson);
+        when(objectMapper.readValue(anyString(), any(TypeReference.class))).thenReturn(Collections.emptySet());
 
         // when
         Set<GitHubResponseDTO> result = sut.getRepositories(VALID_USERNAME);
@@ -72,6 +81,7 @@ class GitHubServiceImplTest {
     void getRepositories_withExistingUsernameAndNoRepositories_returnsEmptySet() throws IOException {
         // given
         lenient().when(restTemplate.getForObject(REPOSITORY_URL, String.class)).thenReturn("[]");
+        when(objectMapper.readValue(anyString(), any(TypeReference.class))).thenReturn(Collections.emptySet());
 
         // when
         Set<GitHubResponseDTO> result = sut.getRepositories(VALID_USERNAME);

@@ -20,13 +20,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class GitHubServiceImpl implements GitHubService {
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper;
     private final String gitHubApiBaseUrl;
 
-    GitHubServiceImpl(RestTemplate restTemplate, @Value("${github.api.base-url}") String gitHubApiBaseUrl) {
+    GitHubServiceImpl(RestTemplate restTemplate, ObjectMapper objectMapper, @Value("${github.api.base-url}") String gitHubApiBaseUrl) {
         this.restTemplate = restTemplate;
         this.gitHubApiBaseUrl = gitHubApiBaseUrl;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -50,7 +51,7 @@ public class GitHubServiceImpl implements GitHubService {
         return gitHubResponseDTOS;
     }
 
-    public Set<RepositoryDTO> fetchUserNonForkRepositories(String username) {
+    Set<RepositoryDTO> fetchUserNonForkRepositories(String username) {
         String url = gitHubApiBaseUrl + "/users/" + username + "/repos";
         String json;
         try {
@@ -60,7 +61,7 @@ public class GitHubServiceImpl implements GitHubService {
         }
 
         try {
-            Set<RepositoryDTO> repositoryDTOS = OBJECT_MAPPER.readValue(json, new TypeReference<>() {
+            Set<RepositoryDTO> repositoryDTOS = objectMapper.readValue(json, new TypeReference<>() {
             });
             return repositoryDTOS.stream()
                     .filter(repositoryDTO -> !repositoryDTO.fork())
@@ -71,7 +72,7 @@ public class GitHubServiceImpl implements GitHubService {
         }
     }
 
-    public Set<BranchDTO> fetchRepositoryBranches(String username, String repositoryName) {
+    Set<BranchDTO> fetchRepositoryBranches(String username, String repositoryName) {
         String url = gitHubApiBaseUrl + "/repos/" + username + "/" + repositoryName + "/branches";
         String json;
         try {
@@ -82,7 +83,7 @@ public class GitHubServiceImpl implements GitHubService {
         }
 
         try {
-            return OBJECT_MAPPER.readValue(json, new TypeReference<>() {
+            return objectMapper.readValue(json, new TypeReference<>() {
             });
         } catch (Exception e) {
             throw new DataProcessingException("Failed to process branch data for repository: " + repositoryName + " under username: " + username + ". Check the response structure and data integrity.");
