@@ -4,7 +4,6 @@ import com.example.Atipera.exceptions.DataProcessingException;
 import com.example.Atipera.exceptions.ResourceNotFoundException;
 import com.example.Atipera.github.DTOs.BranchDTO;
 import com.example.Atipera.github.DTOs.GitHubResponseDTO;
-import com.example.Atipera.github.DTOs.GitHubService;
 import com.example.Atipera.github.DTOs.RepositoryDTO;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

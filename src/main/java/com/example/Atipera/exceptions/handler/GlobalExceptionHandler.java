@@ -1,7 +1,6 @@
 package com.example.Atipera.exceptions.handler;
 
 import com.example.Atipera.exceptions.DataProcessingException;
-import com.example.Atipera.exceptions.InvalidRequestDataException;
 import com.example.Atipera.exceptions.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,12 +12,6 @@ import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-
-    @ExceptionHandler(InvalidRequestDataException.class)
-    public ResponseEntity<?> handleMissingRequestDataException(InvalidRequestDataException e) {
-        return new ResponseEntity<>(messageBuilder(e.getMessage() + " Please provide missing data.",
-                HttpStatus.BAD_REQUEST), HttpStatus.BAD_REQUEST);
-    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException e) {

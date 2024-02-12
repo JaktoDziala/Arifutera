@@ -1,7 +1,6 @@
 package com.example.Atipera.github;
 
 import com.example.Atipera.exceptions.ResourceNotFoundException;
-import com.example.Atipera.github.DTOs.GitHubService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

@@ -1,4 +1,8 @@
-package com.example.Atipera.github.DTOs;
+package com.example.Atipera.github;
+
+import com.example.Atipera.github.DTOs.BranchDTO;
+import com.example.Atipera.github.DTOs.GitHubResponseDTO;
+import com.example.Atipera.github.DTOs.RepositoryDTO;
 
 import java.util.Set;
 
