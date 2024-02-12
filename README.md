@@ -1,6 +1,6 @@
 Atipera interview task
 =====================
-This Java Spring Boot application provides a REST API to list all GitHub repositories for a given user that are not forks. It uses GitHub with anonymous connection for API methods usage.
+This Java Spring Boot application provides a REST API to list all GitHub repositories for a given user that are not forks.
 
 ---
 ## Features
@@ -17,7 +17,7 @@ This Java Spring Boot application provides a REST API to list all GitHub reposit
 
 ## Configuration
 
-The application connects to the GitHub API anonymously. No additional configuration is required for this.
+No additional configuration is required.
 
 To run the application, execute the following commands in the terminal:
 
