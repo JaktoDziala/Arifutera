@@ -1,20 +1,13 @@
 package com.example.Atipera.config;
 
-import com.example.Atipera.exceptions.SetupException;
-import org.kohsuke.github.GitHub;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.io.IOException;
+import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class AppConfig {
     @Bean
-    public GitHub gitHub() throws IOException{
-        try {
-            return GitHub.connectAnonymously();
-        } catch (IOException ignore) {
-            throw new SetupException("Failed to anonymously connect into GitHub API!");
-        }
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }

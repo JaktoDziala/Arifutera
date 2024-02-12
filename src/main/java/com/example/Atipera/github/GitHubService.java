@@ -1,66 +1,86 @@
 package com.example.Atipera.github;
 
+import com.example.Atipera.exceptions.ResourceNotFoundException;
 import com.example.Atipera.github.DTOs.BranchDTO;
 import com.example.Atipera.github.DTOs.GitHubResponseDTO;
-import org.kohsuke.github.GHFileNotFoundException;
-import org.kohsuke.github.GHRepository;
-import org.kohsuke.github.GHUser;
-import org.kohsuke.github.GitHub;
+import com.example.Atipera.github.DTOs.RepositoryDTO;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 
 @Service
 public class GitHubService {
-    private final GitHub gitHub;
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private final RestTemplate restTemplate;
 
-    GitHubService(GitHub gitHub) {
-        this.gitHub = gitHub;
+    @Autowired
+    public GitHubService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
     }
 
-    Set<GitHubResponseDTO> getRepositories(String username) throws IOException {
-        GHUser ghUser = getGHUser(username);
-        Set<GitHubResponseDTO> responseDTOS = new HashSet<>();
-        Map<String, GHRepository> nonForkRepositories = getNonForkRepositories(ghUser.getRepositories());
+    public Set<GitHubResponseDTO> getRepositories(String username) {
+        Set<GitHubResponseDTO> gitHubResponseDTOS = new HashSet<>();
 
-        nonForkRepositories.forEach((name, repository) -> {
-            Set<BranchDTO> branchDTOs = new HashSet<>();
-            try {
-                repository.getBranches().forEach((branchName, branch) -> {
-                    branchDTOs.add(new BranchDTO(branchName, branch.getSHA1()));
-                });
-            } catch (IOException e) {
-                throw new NoSuchElementException(e);
-            }
-            responseDTOS.add(new GitHubResponseDTO(
-                    repository.getName(),
-                    ghUser.getLogin(),
-                    branchDTOs
-            ));
-        });
+        fetchUserNonForkRepositories(username).forEach((repositoryDTO -> {
+            Set<BranchDTO> branches = fetchRepositoryBranches(username, repositoryDTO.name());
+            gitHubResponseDTOS.add(
+                    new GitHubResponseDTO(
+                            repositoryDTO.name(),
+                            repositoryDTO.owner().login(),
+                            branches));
+        }
+        ));
 
-        return responseDTOS;
+        return gitHubResponseDTOS;
     }
 
-    // Ignoring service isBlank validation since controller is currently the only point of entry in given requirements
-    GHUser getGHUser(String username) throws IOException {
+    public Set<RepositoryDTO> fetchUserNonForkRepositories(String username) {
+        String url;
+        url = "https://api.github.com/users/" + username + "/repos";
+        String json;
         try {
-            return gitHub.getUser(username);
-        } catch (IOException e) {
-            throw new GHFileNotFoundException("Username could not be found!");
+             json = restTemplate.getForObject(url, String.class);
+        } catch (HttpClientErrorException e){
+            throw new ResourceNotFoundException(String.format("Username " + username + " could not be found!"));
+        }
+
+        try {
+            Set<RepositoryDTO> repositoryDTOS = OBJECT_MAPPER.readValue(json, new TypeReference<>() {
+            });
+            return repositoryDTOS.stream()
+                    .filter(repositoryDTO -> !repositoryDTO.fork())
+                    .collect(Collectors.toSet());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
-    Map<String, GHRepository> getNonForkRepositories(Map<String, GHRepository> repositoryMap) {
-        return repositoryMap.entrySet().stream()
-                .filter(repository -> !repository.getValue().isFork())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
+    public Set<BranchDTO> fetchRepositoryBranches(String username, String repositoryName) {
+        String url = "https://api.github.com/repos/" + username + "/" + repositoryName + "/branches";
+        String json;
+        try {
+            json = restTemplate.getForObject(url, String.class);
+        } catch (HttpClientErrorException e){
+            throw new ResourceNotFoundException(String.format("Repository " + repositoryName + " could not be found under "+ username + " user! " +
+                    "Check if repository exists or has public visibility."));
+        }
 
+        try {
+            return OBJECT_MAPPER.readValue(json, new TypeReference<>() {
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

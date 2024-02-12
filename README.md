@@ -45,12 +45,14 @@ curl -X GET "http://localhost:8080/user/JaktoDziala" -H "accept: application/jso
 ```json
 [
   {
-    "repositoryName": "gameDirectory",
+    "repositoryName": "Atipera",
     "loginName": "JaktoDziala",
     "branches": [
       {
-        "branchName": "main",
-        "SHA": "fa94ae15e33dea33955c3afd79cea967f578175d"
+        "name": "master",
+        "commit": {
+          "sha": "4ff560e37bf61e9ec27fc9b2560f93bb64a0b932"
+        }
       }
     ]
   }
@@ -60,7 +62,7 @@ curl -X GET "http://localhost:8080/user/JaktoDziala" -H "accept: application/jso
 **Bad result example (username not found):**
 ```json
 {
-  "message": "Username could not be found!",
+  "message": "Username JaktoDziala could not be found!",
   "status": "NOT_FOUND"
 }
 ```

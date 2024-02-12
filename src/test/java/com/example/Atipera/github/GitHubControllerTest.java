@@ -1,7 +1,7 @@
 package com.example.Atipera.github;
 
+import com.example.Atipera.exceptions.ResourceNotFoundException;
 import org.junit.jupiter.api.Test;
-import org.kohsuke.github.GHFileNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -33,7 +33,7 @@ public class GitHubControllerTest {
 
     @Test
     void getRepositories_withNotExistingUsername_throwsException() throws Exception {
-        doThrow(new GHFileNotFoundException("Username could not be found!")).when(gitHubService).getRepositories("Cuba");
+        doThrow(new ResourceNotFoundException("Username could not be found!")).when(gitHubService).getRepositories("Cuba");
 
         mockMvc.perform(get("/user/{username}", "Cuba")
                         .accept(MediaType.APPLICATION_JSON))
