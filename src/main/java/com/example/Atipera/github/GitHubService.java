@@ -8,6 +8,7 @@ import com.example.Atipera.github.DTOs.RepositoryDTO;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -22,17 +23,18 @@ import java.util.stream.Collectors;
 public class GitHubService {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private final RestTemplate restTemplate;
+    private final String gitHubApiBaseUrl;
 
-    @Autowired
-    public GitHubService(RestTemplate restTemplate) {
+    GitHubService(RestTemplate restTemplate, @Value("${github.api.base-url}") String gitHubApiBaseUrl) {
         this.restTemplate = restTemplate;
+        this.gitHubApiBaseUrl = gitHubApiBaseUrl;
     }
 
     /**
      TTL of @Cacheable - 120s
      */
     @Cacheable(value = "repositories", key = "#username")
-    public Set<GitHubResponseDTO> getRepositories(String username) {
+    Set<GitHubResponseDTO> getRepositories(String username) {
         Set<GitHubResponseDTO> gitHubResponseDTOS = new HashSet<>();
 
         fetchUserNonForkRepositories(username).forEach((repositoryDTO -> {
@@ -48,9 +50,8 @@ public class GitHubService {
         return gitHubResponseDTOS;
     }
 
-    public Set<RepositoryDTO> fetchUserNonForkRepositories(String username) {
-        String url;
-        url = "https://api.github.com/users/" + username + "/repos";
+    Set<RepositoryDTO> fetchUserNonForkRepositories(String username) {
+        String url = gitHubApiBaseUrl + "/users/" + username + "/repos";
         String json;
         try {
              json = restTemplate.getForObject(url, String.class);
@@ -70,8 +71,8 @@ public class GitHubService {
         }
     }
 
-    public Set<BranchDTO> fetchRepositoryBranches(String username, String repositoryName) {
-        String url = "https://api.github.com/repos/" + username + "/" + repositoryName + "/branches";
+     Set<BranchDTO> fetchRepositoryBranches(String username, String repositoryName) {
+        String url = gitHubApiBaseUrl + "/repos/" + username + "/" + repositoryName + "/branches";
         String json;
         try {
             json = restTemplate.getForObject(url, String.class);
