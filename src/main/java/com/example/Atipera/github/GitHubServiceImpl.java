@@ -12,9 +12,15 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
 
@@ -23,17 +29,45 @@ public class GitHubServiceImpl implements GitHubService {
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final String gitHubApiBaseUrl;
+    private final ExecutorService executorService;
+    private final WebClient webClient;
 
-    GitHubServiceImpl(RestTemplate restTemplate, ObjectMapper objectMapper, @Value("${github.api.base-url}") String gitHubApiBaseUrl) {
+    GitHubServiceImpl(RestTemplate restTemplate, ObjectMapper objectMapper, @Value("${github.api.base-url}") String gitHubApiBaseUrl, ExecutorService executorService, WebClient webClient) {
         this.restTemplate = restTemplate;
         this.gitHubApiBaseUrl = gitHubApiBaseUrl;
         this.objectMapper = objectMapper;
+        this.executorService = executorService;
+        this.webClient = webClient;
     }
 
-    /**
-     TTL of @Cacheable - 120s
-     */
-    @Cacheable(value = "repositories", key = "#username")
+
+    // REACTIVE
+    @Override
+    public Flux<GitHubResponseDTO> getRepositoriesWebflux(String username) {
+        return fetchUserNonForkRepositoriesReactive(username)
+                .flatMap(repositoryDTO -> fetchRepositoryBranchesReactive(username, repositoryDTO.name())
+                        .collectList()
+                        .map(branches -> new GitHubResponseDTO(repositoryDTO.name(), repositoryDTO.owner().login(), new HashSet<>(branches)))
+                );
+    }
+
+    Flux<RepositoryDTO> fetchUserNonForkRepositoriesReactive(String username) {
+        return webClient.get()
+                .uri ("/users/{username}/repos", username)
+                .retrieve()
+                .bodyToFlux(RepositoryDTO.class)
+                .filter(repositoryDTO -> !repositoryDTO.fork());
+    }
+
+    private Flux<BranchDTO> fetchRepositoryBranchesReactive(String username, String repositoryName) {
+        return webClient.get()
+                .uri("/repos/{username}/{repositoryName}/branches", username, repositoryName)
+                .retrieve()
+                .bodyToFlux(BranchDTO.class);
+    }
+
+
+    // STANDARD (Keeping for fast comparison, learning purpose
     @Override
     public Set<GitHubResponseDTO> getRepositories(String username) {
         Set<GitHubResponseDTO> gitHubResponseDTOS = new HashSet<>();
@@ -55,7 +89,7 @@ public class GitHubServiceImpl implements GitHubService {
         String url = gitHubApiBaseUrl + "/users/" + username + "/repos";
         String json;
         try {
-             json = restTemplate.getForObject(url, String.class);
+            json = restTemplate.getForObject(url, String.class);
         } catch (HttpClientErrorException e){
             throw new ResourceNotFoundException(String.format("Username " + username + " could not be found!"));
         }
