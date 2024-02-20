@@ -1,18 +1,20 @@
-package com.example.Arifutera.github;
+package com.example.Arifutera.github.Impl;
 
 import com.example.Arifutera.exceptions.DataProcessingException;
 import com.example.Arifutera.exceptions.ResourceNotFoundException;
 import com.example.Arifutera.github.DTOs.BranchDTO;
 import com.example.Arifutera.github.DTOs.GitHubResponseDTO;
 import com.example.Arifutera.github.DTOs.RepositoryDTO;
+import com.example.Arifutera.github.GitHubService;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Flux;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -21,49 +23,14 @@ import java.util.stream.Collectors;
 
 
 @Service
-public class GitHubServiceImpl implements GitHubService {
-    private final RestTemplate restTemplate;
-    private final ObjectMapper objectMapper;
-    private final String gitHubApiBaseUrl;
-    private final ExecutorService executorService;
-    private final WebClient webClient;
+public class GitHubServiceRestClientImpl implements GitHubService<Set<GitHubResponseDTO>> {
 
-    GitHubServiceImpl(RestTemplate restTemplate, ObjectMapper objectMapper, @Value("${github.api.base-url}") String gitHubApiBaseUrl, ExecutorService executorService, WebClient webClient) {
-        this.restTemplate = restTemplate;
-        this.gitHubApiBaseUrl = gitHubApiBaseUrl;
-        this.objectMapper = objectMapper;
-        this.executorService = executorService;
-        this.webClient = webClient;
+    private final RestClient restClient;
+
+    GitHubServiceRestClientImpl(RestClient restClient) {
+        this.restClient = restClient;
     }
 
-
-    // REACTIVE
-    @Override
-    public Flux<GitHubResponseDTO> getRepositoriesWebflux(String username) {
-        return fetchUserNonForkRepositoriesReactive(username)
-                .flatMap(repositoryDTO -> fetchRepositoryBranchesReactive(username, repositoryDTO.name())
-                        .collectList()
-                        .map(branches -> new GitHubResponseDTO(repositoryDTO.name(), repositoryDTO.owner().login(), new HashSet<>(branches)))
-                );
-    }
-
-    Flux<RepositoryDTO> fetchUserNonForkRepositoriesReactive(String username) {
-        return webClient.get()
-                .uri ("/users/{username}/repos", username)
-                .retrieve()
-                .bodyToFlux(RepositoryDTO.class)
-                .filter(repositoryDTO -> !repositoryDTO.fork());
-    }
-
-    private Flux<BranchDTO> fetchRepositoryBranchesReactive(String username, String repositoryName) {
-        return webClient.get()
-                .uri("/repos/{username}/{repositoryName}/branches", username, repositoryName)
-                .retrieve()
-                .bodyToFlux(BranchDTO.class);
-    }
-
-
-    // STANDARD (Keeping for fast comparison, learning purpose
     @Override
     public Set<GitHubResponseDTO> getRepositories(String username) {
         Set<GitHubResponseDTO> gitHubResponseDTOS = new HashSet<>();
@@ -86,7 +53,7 @@ public class GitHubServiceImpl implements GitHubService {
         String json;
         try {
             json = restTemplate.getForObject(url, String.class);
-        } catch (HttpClientErrorException e){
+        } catch (HttpClientErrorException e) {
             throw new ResourceNotFoundException(String.format("Username " + username + " could not be found!"));
         }
 
@@ -102,13 +69,20 @@ public class GitHubServiceImpl implements GitHubService {
         }
     }
 
+    // TODO: Start from here, fix, add error handling
+    //  https://docs.spring.io/spring-framework/reference/integration/rest-clients.html#_error_handling
     Set<BranchDTO> fetchRepositoryBranches(String username, String repositoryName) {
+        return restClient.get()
+                .uri("/repos/{username}/{repositoryName}/branches", username, repositoryName)
+                .retrieve()
+                .toEntity(Set < BranchDTO >);
+
         String url = gitHubApiBaseUrl + "/repos/" + username + "/" + repositoryName + "/branches";
         String json;
         try {
             json = restTemplate.getForObject(url, String.class);
-        } catch (HttpClientErrorException e){
-            throw new ResourceNotFoundException(String.format("Repository " + repositoryName + " could not be found under "+ username + " user! " +
+        } catch (HttpClientErrorException e) {
+            throw new ResourceNotFoundException(String.format("Repository " + repositoryName + " could not be found under " + username + " user! " +
                     "Check if repository exists or has public visibility."));
         }
 
