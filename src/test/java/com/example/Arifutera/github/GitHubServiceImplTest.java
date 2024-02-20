@@ -1,7 +1,7 @@
-//package com.example.Atipera.github;
+//package com.example.Arifutera.github;
 //
-//import com.example.Atipera.exceptions.ResourceNotFoundException;
-//import com.example.Atipera.github.DTOs.*;
+//import com.example.Arifutera.exceptions.ResourceNotFoundException;
+//import com.example.Arifutera.github.DTOs.*;
 //import com.fasterxml.jackson.core.type.TypeReference;
 //import com.fasterxml.jackson.databind.ObjectMapper;
 //import org.junit.jupiter.api.BeforeEach;

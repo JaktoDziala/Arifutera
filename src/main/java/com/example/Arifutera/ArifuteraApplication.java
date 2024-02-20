@@ -1,13 +1,13 @@
-package com.example.Atipera;
+package com.example.Arifutera;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AtiperaApplication {
+public class ArifuteraApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AtiperaApplication.class, args);
+		SpringApplication.run(ArifuteraApplication.class, args);
 	}
 
 }

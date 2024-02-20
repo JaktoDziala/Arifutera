@@ -1,4 +1,4 @@
-package com.example.Atipera.github.DTOs;
+package com.example.Arifutera.github.DTOs;
 
 import java.util.Set;
 

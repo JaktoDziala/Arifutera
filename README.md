@@ -1,4 +1,4 @@
-Atipera interview task
+Arifutera
 =====================
 This Java Spring Boot application provides a REST API to list all GitHub repositories that are not forks for a given user
 
@@ -45,7 +45,7 @@ curl -X GET "http://localhost:8080/user/JaktoDziala" -H "accept: application/jso
 ```json
 [
   {
-    "repositoryName": "Atipera",
+    "repositoryName": "Arifutera",
     "loginName": "JaktoDziala",
     "branches": [
       {

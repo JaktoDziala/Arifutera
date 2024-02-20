@@ -1,7 +1,7 @@
-package com.example.Atipera.exceptions.handler;
+package com.example.Arifutera.exceptions.handler;
 
-import com.example.Atipera.exceptions.DataProcessingException;
-import com.example.Atipera.exceptions.ResourceNotFoundException;
+import com.example.Arifutera.exceptions.DataProcessingException;
+import com.example.Arifutera.exceptions.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

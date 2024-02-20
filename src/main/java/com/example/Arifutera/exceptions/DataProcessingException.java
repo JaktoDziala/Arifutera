@@ -1,4 +1,4 @@
-package com.example.Atipera.exceptions;
+package com.example.Arifutera.exceptions;
 
 public class DataProcessingException extends RuntimeException{
     public DataProcessingException(String message){

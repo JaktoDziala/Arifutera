@@ -1,6 +1,6 @@
-package com.example.Atipera.github;
+package com.example.Arifutera.github;
 
-import com.example.Atipera.github.DTOs.GitHubResponseDTO;
+import com.example.Arifutera.github.DTOs.GitHubResponseDTO;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

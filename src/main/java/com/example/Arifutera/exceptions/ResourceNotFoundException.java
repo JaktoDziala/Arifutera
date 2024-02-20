@@ -1,4 +1,4 @@
-package com.example.Atipera.exceptions;
+package com.example.Arifutera.exceptions;
 
 public class ResourceNotFoundException extends RuntimeException{
     public ResourceNotFoundException(String message){

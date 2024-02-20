@@ -1,25 +1,21 @@
-package com.example.Atipera.github;
+package com.example.Arifutera.github;
 
-import com.example.Atipera.exceptions.DataProcessingException;
-import com.example.Atipera.exceptions.ResourceNotFoundException;
-import com.example.Atipera.github.DTOs.BranchDTO;
-import com.example.Atipera.github.DTOs.GitHubResponseDTO;
-import com.example.Atipera.github.DTOs.RepositoryDTO;
+import com.example.Arifutera.exceptions.DataProcessingException;
+import com.example.Arifutera.exceptions.ResourceNotFoundException;
+import com.example.Arifutera.github.DTOs.BranchDTO;
+import com.example.Arifutera.github.DTOs.GitHubResponseDTO;
+import com.example.Arifutera.github.DTOs.RepositoryDTO;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.stream.Collectors;
 
