@@ -25,14 +25,14 @@ public class GitHubServiceWebFluxImpl implements GitHubService<Flux<GitHubRespon
 
     @Override
     public Flux<GitHubResponseDTO> getRepositories(String username) {
-        return fetchUserNonForkRepositoriesReactive(username)
-                .flatMap(repositoryDTO -> fetchRepositoryBranchesReactive(username, repositoryDTO.name())
+        return fetchNonForkRepositories(username)
+                .flatMap(repositoryDTO -> fetchRepositoryBranches(username, repositoryDTO.name())
                         .collectList()
                         .map(branches -> new GitHubResponseDTO(repositoryDTO.name(), repositoryDTO.owner().login(), new HashSet<>(branches)))
                 );
     }
 
-    Flux<RepositoryDTO> fetchUserNonForkRepositoriesReactive(String username) {
+    private Flux<RepositoryDTO> fetchNonForkRepositories(String username) {
         return webClient.get()
                 .uri ("/users/{username}/repos", username)
                 .retrieve()
@@ -40,7 +40,7 @@ public class GitHubServiceWebFluxImpl implements GitHubService<Flux<GitHubRespon
                 .filter(repositoryDTO -> !repositoryDTO.fork());
     }
 
-    private Flux<BranchDTO> fetchRepositoryBranchesReactive(String username, String repositoryName) {
+    private Flux<BranchDTO> fetchRepositoryBranches(String username, String repositoryName) {
         return webClient.get()
                 .uri("/repos/{username}/{repositoryName}/branches", username, repositoryName)
                 .retrieve()
