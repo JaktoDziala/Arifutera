@@ -11,6 +11,7 @@ import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriBuilder;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -43,24 +44,25 @@ public class GitHubServiceRestClientImpl implements GitHubService<Set<GitHubResp
     }
 
     private Set<RepositoryDTO> fetchNonForkRepositories(String username) {
-        RepositoryDTO[] repositories = restClient.get()
+        Set<RepositoryDTO> repositoryDTOS = restClient.get()
                 .uri("/users/{username}/repos", username)
                 .retrieve()
-                .body(RepositoryDTO[].class);
+                .body(new ParameterizedTypeReference<>() {});
 
-        return Arrays.stream(repositories)
+        // TODO: Check in IT test this collection nullability.
+        //  Set<RepositoryDTO> repositoryDTOS = new HashSet() was not resolving null value exception warning
+        return repositoryDTOS == null ? Collections.emptySet() : repositoryDTOS.stream()
                 .filter(repositoryDTO -> !repositoryDTO.fork())
                 .collect(Collectors.toSet());
     }
 
     // TODO: vs uriBuilder.path("/users/{username}/repos").build(username)
-    // TODO: .body(BranchDTO[].class) vs body(new ParameterizedTypeReference<>() {});
     // TODO: exception handling
     private Set<BranchDTO> fetchRepositoryBranches(String username, String repositoryName) {
-        BranchDTO[] branches = restClient.get()
+        return restClient.get()
                 .uri("/repos/{username}/{repositoryName}/branches", username, repositoryName)
                 .retrieve()
-                .body(BranchDTO[].class);
-        return Set.of(branches);
+                .body(new ParameterizedTypeReference<>() {
+                });
     }
 }
