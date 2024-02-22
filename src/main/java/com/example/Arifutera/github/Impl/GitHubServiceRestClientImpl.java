@@ -8,9 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.util.UriBuilder;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -56,7 +54,6 @@ public class GitHubServiceRestClientImpl implements GitHubService<Set<GitHubResp
                 .collect(Collectors.toSet());
     }
 
-    // TODO: vs uriBuilder.path("/users/{username}/repos").build(username)
     // TODO: exception handling
     private Set<BranchDTO> fetchRepositoryBranches(String username, String repositoryName) {
         return restClient.get()
