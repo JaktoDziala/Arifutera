@@ -17,9 +17,9 @@ This Java Spring Boot application provides a REST API to list all GitHub reposit
 
 ## Configuration
 
-No additional configuration is required.
+No additional configuration is required.*
 
-To run the application, execute the following commands in the terminal:
+*If experiencing issue with `Failed to resolve 'api.github.com' [A(1)] after 2 queries` add VM option to configuration: `-Djava.net.preferIPv4Stack=true`
 
 ---
 

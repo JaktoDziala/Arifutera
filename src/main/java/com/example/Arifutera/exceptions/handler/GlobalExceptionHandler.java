@@ -1,6 +1,5 @@
 package com.example.Arifutera.exceptions.handler;
 
-import com.example.Arifutera.exceptions.DataProcessingException;
 import com.example.Arifutera.exceptions.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -27,31 +26,25 @@ public class GlobalExceptionHandler {
                 NOT_FOUND), NOT_FOUND);
     }
 
-    @ExceptionHandler(DataProcessingException.class)
-    public ResponseEntity<?> handleDataProcessingException(DataProcessingException e) {
-        return new ResponseEntity<>(messageBuilder(e.getMessage(),
-                HttpStatus.INTERNAL_SERVER_ERROR), HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
     @ExceptionHandler(HttpClientErrorException.class)
     public ResponseEntity<?> handleHttpClientErrorException(HttpClientErrorException ex) {
-        return switch (ex.getStatusCode().toString()) {
-            case "NOT_FOUND" -> new ResponseEntity<>(messageBuilder("Username could not be found",
-                    NOT_FOUND), NOT_FOUND);
-            case "BAD_REQUEST" -> new ResponseEntity<>(messageBuilder(ex.getMessage(),
-                    BAD_REQUEST), BAD_REQUEST);
+        return switch ((HttpStatus) ex.getStatusCode()) {
+            case NOT_FOUND -> new ResponseEntity<>(messageBuilder("User of given username could not be found.",
+                    ex.getStatusCode()), NOT_FOUND);
+            case BAD_REQUEST -> new ResponseEntity<>(messageBuilder(ex.getMessage(),
+                    ex.getStatusCode()), BAD_REQUEST);
             default -> new ResponseEntity<>(messageBuilder(ex.getMessage(),
-                    INTERNAL_SERVER_ERROR), INTERNAL_SERVER_ERROR);
+                    ex.getStatusCode()), INTERNAL_SERVER_ERROR);
         };
     }
 
     @ExceptionHandler(WebClientResponseException.class)
     public ResponseEntity<?> handleWebClientResponseException(WebClientResponseException ex) {
-        return switch (ex.getStatusCode().toString()) {
-            case "NOT_FOUND" -> new ResponseEntity<>(messageBuilder("Username could not be found",
-                    NOT_FOUND), NOT_FOUND);
-            case "BAD_REQUEST" -> new ResponseEntity<>(messageBuilder(ex.getMessage(),
-                    BAD_REQUEST), BAD_REQUEST);
+        return switch ((HttpStatus) ex.getStatusCode()) {
+            case NOT_FOUND -> new ResponseEntity<>(messageBuilder("User of given username could not be found.",
+                    ex.getStatusCode()), NOT_FOUND);
+            case BAD_REQUEST -> new ResponseEntity<>(messageBuilder(ex.getMessage(),
+                    ex.getStatusCode()), BAD_REQUEST);
             default -> new ResponseEntity<>(messageBuilder(ex.getMessage(),
                     ex.getStatusCode()), INTERNAL_SERVER_ERROR);
         };
