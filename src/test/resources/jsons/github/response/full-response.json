@@ -1,0 +1,20 @@
+[
+  {
+    "repositoryName": "ArifuteraNonFork",
+    "loginName": "JaktoDziala",
+    "branches": [
+      {
+        "name": "master",
+        "commit": {
+          "sha": "17aa1dea3684dda9a59c57b8d7ea77a1f0616018"
+        }
+      },
+      {
+        "name": "development",
+        "commit": {
+          "sha": "fa94ae15e33dea33955c3afd79cea967f578175d"
+        }
+      }
+    ]
+  }
+]

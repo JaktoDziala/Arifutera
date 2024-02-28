@@ -9,7 +9,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -47,14 +46,11 @@ public class GitHubServiceRestClientImpl implements GitHubService<Set<GitHubResp
                 .retrieve()
                 .body(new ParameterizedTypeReference<>() {});
 
-        // TODO: Check in IT test this collection nullability.
-        //  Set<RepositoryDTO> repositoryDTOS = new HashSet() was not resolving null value exception warning
-        return repositoryDTOS == null ? Collections.emptySet() : repositoryDTOS.stream()
+        return repositoryDTOS.stream()
                 .filter(repositoryDTO -> !repositoryDTO.fork())
                 .collect(Collectors.toSet());
     }
 
-    // TODO: exception handling
     private Set<BranchDTO> fetchRepositoryBranches(String username, String repositoryName) {
         return restClient.get()
                 .uri("/repos/{username}/{repositoryName}/branches", username, repositoryName)
