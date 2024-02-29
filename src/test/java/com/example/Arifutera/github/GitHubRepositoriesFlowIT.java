@@ -25,9 +25,9 @@ class GitHubRepositoriesFlowIT {
     @Autowired
     GitHubController sut;
 
-    public static String INVALID_USERNAME = "NotFound";
-    public static String VALID_USERNAME = "JaktoDziala";
-    public static String VALID_REPOSITORY = "ArifuteraNonFork";
+    public static final String INVALID_USERNAME = "NotFound";
+    public static final String VALID_USERNAME = "JaktoDziala";
+    public static final String VALID_REPOSITORY = "ArifuteraNonFork";
 
     @DynamicPropertySource
     static void configure(DynamicPropertyRegistry registry) {

@@ -34,7 +34,7 @@ public class AppConfig {
     // ASYNCHRONOUS
     @Bean
     public WebClient webClient() {
-        return WebClient.create("https://api.github.com");
+        return WebClient.create(gitHubApiBaseUrl);
     }
 
     // SYNCHRONOUS
