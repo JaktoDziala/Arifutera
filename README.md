@@ -95,6 +95,13 @@ This section describes the key configuration properties used by the application.
     - **Example Value**: `https://api.github.com`
 
 ---
+
+### Performance testing
+
+java -jar wiremock-standalone-3.4.1.jar --port 8081
+java -jar wiremock-standalone-3.4.1.jar --root-dir ./src/test/resources/wiremock --port 8081
+
+
 # Contact details
 name: Jakub Banach
 

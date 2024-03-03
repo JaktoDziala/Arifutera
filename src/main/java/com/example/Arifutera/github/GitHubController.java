@@ -15,13 +15,16 @@ public class GitHubController {
 
     private final GitHubService<Flux<GitHubResponseDTO>> gitHubServiceWebFlux;
     private final GitHubService<Set<GitHubResponseDTO>> gitHubServiceRestClient;
+    private final GitHubService<Set<GitHubResponseDTO>> gitHubServiceRestClientVirtual;
 
 
     public GitHubController(@Qualifier("webFlux") GitHubService<Flux<GitHubResponseDTO>> gitHubServiceWebFlux,
-                            @Qualifier("restClient") GitHubService<Set<GitHubResponseDTO>> gitHubServiceRestClient
+                            @Qualifier("restClient") GitHubService<Set<GitHubResponseDTO>> gitHubServiceRestClient,
+                            @Qualifier("restClientVirtual") GitHubService<Set<GitHubResponseDTO>> gitHubServiceRestClientVirtual
     ) {
         this.gitHubServiceWebFlux = gitHubServiceWebFlux;
         this.gitHubServiceRestClient = gitHubServiceRestClient;
+        this.gitHubServiceRestClientVirtual = gitHubServiceRestClientVirtual;
     }
 
     @GetMapping("/web-flux/user/{username}")
@@ -30,10 +33,15 @@ public class GitHubController {
 
     }
 
-
     @GetMapping("/rest-client/user/{username}")
     ResponseEntity<Set<GitHubResponseDTO>> getRepositoriesRestClient(@PathVariable String username) {
         return ResponseEntity.ok(gitHubServiceRestClient.getRepositories(username));
+
+    }
+
+    @GetMapping("/rest-client/virtual/user/{username}")
+    ResponseEntity<Set<GitHubResponseDTO>> getRepositoriesRestClientVirtual(@PathVariable String username) {
+        return ResponseEntity.ok(gitHubServiceRestClientVirtual.getRepositories(username));
 
     }
 }
